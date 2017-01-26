@@ -48,13 +48,19 @@ int main(int argc, char *argv[])
     }
 
     char *tmpBuff = calloc(1, fileEnd + 1);
+	//buffer holding strings
+	//array holding pointers of words
 
-	 for (int count = 0; count < fileEnd; count++)
+    for (int count = 0; count < fileEnd; count++)
     {
         tmpBuff[count] = fgetc(encodeFile);
 	}
+	
+	
+	
+	
 	printf("%s\n", tmpBuff);
-	free(tmpBuff);
+	//free(tmpBuff);
 }
 
 
