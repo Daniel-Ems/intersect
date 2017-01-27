@@ -44,17 +44,17 @@ will print the char *word of the node as long as the root->count matches argv.
 CITE: The function print_node was modified from the BSTnode exercise handed out 
 during Datastructures and Algorithims I.
 *******************************************************************************/
-void print_node(wordnode *root, int argv)
+void print_node(wordnode *root)
 {
 
 	if(root->left)
 	{
-		print_node(root->left, argv);
+		print_node(root->left);
 	}
-		printf("%s\n", root->word);
+	printf("%s\n", root->word);
 	if (root -> right)
 	{
-		print_node(root->right, argv);
+		print_node(root->right);
 	}
 	
 }
@@ -96,21 +96,23 @@ check whether or not a word exists within a tree before the word inserts.
 *******************************************************************************/
 bool word_check(char *string, wordnode *root)
 {
+	bool match = false;
 	if(root == NULL)
 	{
 		return false;
 	}
-	word_check(string, root->left);
-	word_check(string, root->right);
 	
 	if(strcasecmp(string, root->word) == 0)
 	{
 		return true;
 	}
-	else 
+	
+	if(word_check(string, root->left))
 	{
-		return false;
+		return true;
 	}
+	match = word_check(string, root->right);
+	return match;
 }
 
 /*******************************************************************************
@@ -210,12 +212,12 @@ int main(int argc, char *argv[])
 	{
 		if(!word_check(token,root))
 		{
-			root = Insert(root, token);
+				root = Insert(root, token);
 		}
 		token = strtok(NULL, " \n\t");
 	}
-	
-	memset(tmpBuff, '\0', 256);
+	//print_node(root);
+	memset(tmpBuff, '\0', strlen(tmpBuff));
 	
 	wordnode *new = NULL;
 	int a = 2;
@@ -224,7 +226,7 @@ int main(int argc, char *argv[])
 	while(a <= argc-1)
 	{
 		checkFile = fopen(argv[a], "r");		
-		char letter = '\0';
+		char letter='a';
 		while(letter!=EOF)
 		{
 			letter = fgetc(checkFile);
@@ -239,6 +241,7 @@ int main(int argc, char *argv[])
 				}
 				memset(tmpBuff, '\0', strlen(tmpBuff));
 				count = 0;
+
 			}
 			else
 			{
@@ -259,7 +262,7 @@ int main(int argc, char *argv[])
 		
 	
 
-	print_node(root, (argc-1));
+	print_node(root);
 
 	destroy_wordtree(root);
 	free(tmpBuff);
