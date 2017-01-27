@@ -15,7 +15,9 @@
 #include <strings.h>
 #include <stdbool.h>
 
-enum {MAX_WORD_SIZE = 256};
+
+enum {TEST_FILES = 2};
+enum {MAX_WORD_SIZE = 256}; //This is the maximum size of a word.
 /*******************************************************************************
 typedef struct wordnode 
 
