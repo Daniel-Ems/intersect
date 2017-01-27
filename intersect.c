@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-	FILE *encodeFile;
+	FILE *dictionaryFile;
 
     struct stat *buf = malloc(sizeof(*buf));
 
@@ -25,9 +25,9 @@ int main(int argc, char *argv[])
     }
     else
     {
-        encodeFile = fopen(argv[1], "r");
+       	dictionaryFile = fopen(argv[1], "r");
 
-        if (!encodeFile)
+        if (!dictionaryFile)
         {
             return EX_USAGE;
         }
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	char letter = 'a';
 	while(letter != EOF)
  	{
-		letter = fgetc(encodeFile);
+		letter = fgetc(dictionaryFile);
  		tmpBuff[count] = letter;
 		if(isspace(letter))
 		{
@@ -66,14 +66,14 @@ int main(int argc, char *argv[])
 	count = 0;
 
 	int a = 2;
-	FILE *checkFile;
+	FILE *intersectFiles;
 	while(a <= argc-1)
 	{
-		checkFile = fopen(argv[a], "r");	
+		intersectFiles = fopen(argv[a], "r");	
 		letter='a';
 		while(letter!=EOF)
 		{
-			letter = fgetc(checkFile);
+			letter = fgetc(intersectFiles);
 			tmpBuff[count] = letter;
 	
 			if(isspace(letter))
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		fclose(checkFile);
+		fclose(intersectFiles);
 		memset(tmpBuff, '\0', strlen(tmpBuff));
 		a++;
 	}
@@ -101,8 +101,8 @@ int main(int argc, char *argv[])
 	destroy_wordtree(root);
 	free(tmpBuff);
 	free(buf);
-	fclose(encodeFile);
-	//fclose(checkFile);
+	fclose(dictionaryFile);
+	//fclose(intersectFiles);
 	
 }
 
