@@ -6,17 +6,20 @@ int main(int argc, char *argv[])
 	FILE *dictionaryFile;
 
     struct stat *buf = malloc(sizeof(*buf));
+	int i = 1;
+    off_t fileEnd;
 
-    stat(argv[1], buf);
+	for(i = 1; i < argc; i++)
+	{
+    	stat(argv[i], buf);
+		fileEnd = buf->st_size;
+		if(fileEnd == 0)
+		{
+			printf("Empty Files not allowed\n");
+			return EX_USAGE;
+		}
+	}
 
-
-    off_t fileEnd = buf->st_size;
-
-
-    if (fileEnd == 0)
-    {
-        return EX_USAGE;
-    }
 
     if (argc < 3)
     {
@@ -38,7 +41,7 @@ int main(int argc, char *argv[])
     char *tmpBuff = calloc(1, MAX_WORD_SIZE);
 	if(tmpBuff == NULL)
 	{
-		printf("calloc failed");
+		printf("calloc failed\n");
 		return EX_USAGE;
 	}
 
@@ -65,11 +68,16 @@ int main(int argc, char *argv[])
 
 	count = 0;
 
-	int a = 2;
+	int curFile = TEST_FILES;
 	FILE *intersectFiles;
-	while(a <= argc-1)
+	while(curFile <= argc-1)
 	{
-		intersectFiles = fopen(argv[a], "r");	
+		intersectFiles = fopen(argv[curFile], "r");
+		if(!intersectFiles)
+		{
+			printf("Bad File\n");
+			return EX_USAGE;
+		}	
 		letter='a';
 		while(letter!=EOF)
 		{
@@ -79,7 +87,7 @@ int main(int argc, char *argv[])
 			if(isspace(letter))
 			{
 				tmpBuff[count] ='\0';
-				word_check(tmpBuff, root, a);
+				word_check(tmpBuff, root, curFile);
 				memset(tmpBuff, '\0', strlen(tmpBuff));
 				count = 0;
 
@@ -92,11 +100,10 @@ int main(int argc, char *argv[])
 
 		fclose(intersectFiles);
 		memset(tmpBuff, '\0', strlen(tmpBuff));
-		a++;
+		curFile++;
 	}
-				
-				
-	print_node(root, argc-1);
+						
+	print_node(root, argc -1);
 
 	destroy_wordtree(root);
 	free(tmpBuff);
