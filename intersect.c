@@ -11,7 +11,17 @@
 #include <strings.h>
 #include <stdbool.h>
 
+/*******************************************************************************
+wordnode holds a char *string, wordnode *left and right nodes, 
+and an int counter. 
 
+The char *word holds the string to be stored.
+The wordnode *left and *right build the tree.
+The int count is used to determine whether the word is intersected.
+
+CITE: The struct wordnode is a modification the the BSTnode we were given in
+Datastructures and Algortithims I.
+*******************************************************************************/
 typedef struct wordnode{
      char *word;
     struct wordnode *left;
@@ -20,36 +30,50 @@ typedef struct wordnode{
 }wordnode;
 
 
-void destroy_array(char **save)
-{
-	printf("in destroy");
-	int a = 0;
-	while(save[a]!=NULL)
-	{
-		free(save[a]);
-		a++;
-	}
-	free(save);
-}
+/*******************************************************************************
+print_node takes a wordnode *, as well as an int argv. 
 
+The wordnode *, points to the root node of the tree to be searced. 
+The int argv, is the the current argv[] positioin
 
+The function recursively moves left, until it hits null, and then it will
+print the char *word of the node as long as the root->count matches argv.
+	
+	**This is used to ensure that words are found in all the files that 
+	have been passed through the command line. 
 
-void print_node(wordnode *root)
+CITE: The function print_node was modified from the BSTnode exercise handed out 
+during Datastructures and Algorithims I.
+*******************************************************************************/
+void print_node(wordnode *root, int argv)
 {
 
 	if(root->left)
 	{
-		print_node(root->left);
+		print_node(root->left, argv);
 	}
-	printf("%s\n", root->word);
+	if(root->count == argv)
+	{
+		printf("%s\n", root->word);
+	}
 	if (root -> right)
 	{
-		print_node(root->right);
+		print_node(root->right, argv);
 	}
 	
 }
 
-void destroy_wordtree(wordnode* root){
+/*******************************************************************************
+destroy_wordtree takes a wordnode *root.
+
+wordnode *root points to the root of the tree. 
+
+the function will move left looking for a null node, and then will recursvely 
+free word, and then root. 
+
+CITE: 
+*******************************************************************************/
+void destroy_wordtree(wordnode *root){
      if (root == NULL) // or if (!root)
           return;
        
@@ -59,24 +83,39 @@ void destroy_wordtree(wordnode* root){
      free(root);
 } 
 
-bool word_check(char * string, wordnode *root)
+/*******************************************************************************
+
+
+
+*******************************************************************************/
+bool word_check(char *string, wordnode *root, int argv)
 {
 	if(root == NULL)
 	{
-		return true;
+		return false;
 	}
-	word_check(string, root->left);
-	word_check(string, root->right);
+	word_check(string, root->left, argv);
+	word_check(string, root->right, argv);
 	
 	if(strcasecmp(string, root->word) == 0)
 	{
-		return false;
+		if(root->count < argv)
+		{
+			root->count++;
+		}
+		return true;
 	}
 	else 
 	{
-		return true;
+		return false;
 	}
 }
+
+/*******************************************************************************
+
+
+
+*******************************************************************************/
 wordnode *Insert(wordnode *root, char *string)
 {
 	if(root==NULL) 
@@ -112,18 +151,19 @@ wordnode *Insert(wordnode *root, char *string)
 	return root; 
 }
 
-//Input code taken from my codec project off github. 
+
+
 int main(int argc, char *argv[])
 {
 	FILE *encodeFile;
-	//FILE *testFile;
+
     struct stat *buf = malloc(sizeof(*buf));
-	//struct stat *file2 = malloc(sizeof(*file2));
+
     stat(argv[1], buf);
-	//stat(argv[2], buf);
+
 
     off_t fileEnd = buf->st_size;
-	//off_t fileEnd2 = file2->st_size;
+
 
     if (fileEnd == 0)
     {
@@ -138,7 +178,7 @@ int main(int argc, char *argv[])
     else
     {
         encodeFile = fopen(argv[1], "r");
-		//testFile = fopen(argv[2], "r");
+
         if (!encodeFile)
         {
             return EX_USAGE;
@@ -158,25 +198,56 @@ int main(int argc, char *argv[])
 	wordnode *root = NULL;
 	while(token != NULL)
 	{
-		if(word_check(token,root))
+		if(!word_check(token,root, 1))
 		{
 			root = Insert(root, token);
 		}
 		token = strtok(NULL, " \n\t");
 	}
 	
-	//memset(tmpBuff, 0, sizeof(tmpBuff);
+	memset(tmpBuff, '\0', strlen(tmpBuff));
+	
+	int a = 2;
+	int count = 0;
+	FILE *checkFile;
+	while(a <= argc-1)
+	{
+		checkFile = fopen(argv[a], "r");		
+		char letter = '\0';
+		while(letter!=EOF)
+		{
+			letter = fgetc(checkFile);
+			tmpBuff[count] = letter;
+	
+			if(isspace(letter))
+			{
+				tmpBuff[count] ='\0';
+				word_check(tmpBuff, root,a);
+				memset(tmpBuff, '\0', strlen(tmpBuff));
+				count = 0;
+			}
+			else
+			{
+				count++;
+			}
+		}
+		fclose(checkFile);
+		memset(tmpBuff, '\0', strlen(tmpBuff));
+		a++;
+	}
+				
+				
+				
+		
 	
 
-	print_node(root);
+	print_node(root, (argc-1));
 
 	destroy_wordtree(root);
 	free(tmpBuff);
-	//free(secondFile);
-	//free(file2);
 	free(buf);
 	fclose(encodeFile);
-	//fclose(testFile);
+	//fclose(checkFile);
 	
 }
 
