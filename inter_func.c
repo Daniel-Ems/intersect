@@ -1,3 +1,5 @@
+#include "intersect.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sysexits.h>
@@ -11,7 +13,6 @@
 #include <strings.h>
 #include <stdbool.h>
 
-#include "intersect.h"
 
 
 
