@@ -7,14 +7,14 @@ CFLAGS+=-std=c11
 LDLIBS+=-lm
 
 BIN=intersect
-DEPS=intersect.o
+DEPS=intersect.o inter_func.o
 
 $(BIN) : $(DEPS)
 
 .PHONY: debug profile clean
 
 debug: CFLAGS+=-g
-debug:$(BINS)
+debug:$(BIN)
 
 profile: CFLAGS+=-pg
 profile: LDFLAGS+=-pg
