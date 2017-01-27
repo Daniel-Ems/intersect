@@ -25,7 +25,7 @@ typedef struct wordnode{
      char *word;
     struct wordnode *left;
     struct wordnode *right;
-	int count;
+
 }wordnode;
 
 
@@ -51,10 +51,7 @@ void print_node(wordnode *root, int argv)
 	{
 		print_node(root->left, argv);
 	}
-	if(root->count == argv)
-	{
 		printf("%s\n", root->word);
-	}
 	if (root -> right)
 	{
 		print_node(root->right, argv);
@@ -97,21 +94,17 @@ from the same file. This would be a false count step.
 Bool is returned so I may
 check whether or not a word exists within a tree before the word inserts. 
 *******************************************************************************/
-bool word_check(char *string, wordnode *root, int argv)
+bool word_check(char *string, wordnode *root)
 {
 	if(root == NULL)
 	{
 		return false;
 	}
-	word_check(string, root->left, argv);
-	word_check(string, root->right, argv);
+	word_check(string, root->left);
+	word_check(string, root->right);
 	
 	if(strcasecmp(string, root->word) == 0)
 	{
-		if(root->count < argv)
-		{
-			root->count++;
-		}
 		return true;
 	}
 	else 
@@ -150,7 +143,6 @@ wordnode *Insert(wordnode *root, char *string)
 			
 			root->word = calloc(1,256);
 			strncpy(root->word, string, strlen(string));
-			root->count = 1;
 			root->left = root->right = NULL;
 		}
 	}
@@ -216,15 +208,16 @@ int main(int argc, char *argv[])
 	wordnode *root = NULL;
 	while(token != NULL)
 	{
-		if(!word_check(token,root, 1))
+		if(!word_check(token,root))
 		{
 			root = Insert(root, token);
 		}
 		token = strtok(NULL, " \n\t");
 	}
 	
-	memset(tmpBuff, '\0', strlen(tmpBuff));
+	memset(tmpBuff, '\0', 256);
 	
+	wordnode *new = NULL;
 	int a = 2;
 	int count = 0;
 	FILE *checkFile;
@@ -240,7 +233,10 @@ int main(int argc, char *argv[])
 			if(isspace(letter))
 			{
 				tmpBuff[count] ='\0';
-				word_check(tmpBuff, root,a);
+				if(word_check(tmpBuff, root))
+				{
+					new = Insert(new, tmpBuff);
+				}
 				memset(tmpBuff, '\0', strlen(tmpBuff));
 				count = 0;
 			}
@@ -249,6 +245,10 @@ int main(int argc, char *argv[])
 				count++;
 			}
 		}
+		destroy_wordtree(root);
+		root = NULL;
+		root = new;
+		new = NULL;
 		fclose(checkFile);
 		memset(tmpBuff, '\0', strlen(tmpBuff));
 		a++;
