@@ -7,13 +7,13 @@ main (int argc, char *argv[])
   FILE *dictionaryFile;
 
   //Struct stat is a built in structure that gives you multiple file 
-  //properties. It is being used here for the size of file property. 
+  //properties. It is being used here for the size of file. 
   struct stat *buf = malloc (sizeof (*buf));
   int i = 1;
   off_t fileEnd;
 
   //The for loop iterates through all files passed through the command line.
-  //the for loop checks to make sure that none of the files are empty.
+  //The for loop then checks to make sure that none of the files are empty.
   for (i = 1; i < argc; i++)
     {
       stat (argv[i], buf);
@@ -25,7 +25,7 @@ main (int argc, char *argv[])
 	}
     }
 
-  //Thhis will check to be sure more than one file was passed to the program.
+  //This will check to be sure more than one file was passed to the program.
   //If this is true, then the first file will be assigned to a file pointer.
   if (argc < 3)
     {
@@ -53,7 +53,7 @@ main (int argc, char *argv[])
       return EX_USAGE;
     }
 
-  wordnode *root = NULL;
+  wordnode *tree = NULL;
   int count = 0;
   char letter = 'a';
   //This while loop will work with the first file and create a binary search
@@ -65,14 +65,14 @@ main (int argc, char *argv[])
       letter = fgetc (dictionaryFile);
       //Letter is assigned to tmpBuff
       tmpBuff[count] = letter;
-      //Letter is then checked whether or not it is a space. if it is then
-      //that position is set to a null byte to terminate the string, and then
+      //Letter is then checked whether or not it is white space. if it is then
+      //that position is set to a null byte to terminate the string Then
       //that string is passed to the insert function. 
       if (isspace (letter))
 	{
 	  tmpBuff[count] = '\0';
-	  root = Insert (root, tmpBuff);
-	  //memset will set the buffer to null to allow for the next word. 
+	  tree = Insert (tree, tmpBuff);
+	  //memset will set the buffer to null to allow for the next word to begin. 
 	  memset (tmpBuff, '\0', strlen (tmpBuff));
 	  count = 0;
 	}
@@ -84,7 +84,7 @@ main (int argc, char *argv[])
     }
 
   count = 0;
-  //This for loop will cycle through the remaining files, and check the
+  //This for loop will cycle through the remaining files, and check them
   //respectively against the dictionary tree already made.
   int curFile = TEST_FILES;	//The current file position in argc. begins at 2.
   FILE *intersectFiles;
@@ -97,19 +97,21 @@ main (int argc, char *argv[])
 	  return EX_USAGE;
 	}
       letter = 'a';
-      //This while loop will act similar to the one prior. 
+      //This while loop will act similar to the one prior. It will pull from 
+	  //the file, letter by letter, populating the buffer until white space
+	  //is found, a NULL byte set, and a word is formed.  
       while (letter != EOF)
 	{
 	  letter = fgetc (intersectFiles);
-	  tmpBuff[count] = letter;
+	  tmpBuff[count] = letter; 
 
 	  if (isspace (letter))
 	    {
 	      tmpBuff[count] = '\0';
-	      //Rather than sending the word to insert, it is sent to word_
-	      //checl where it will see if a word is in the dictionary. If so,
-	      //then the node counter is incrimented. 
-	      word_check (tmpBuff, root, curFile);
+	      //Rather than sending the word to Insert, it is sent to word_
+	      //check where it will see if a word is in the dictionary. If so,
+	      //then the node counter is incremented. 
+	      word_check (tmpBuff, tree, curFile);
 	      memset (tmpBuff, '\0', strlen (tmpBuff));
 	      count = 0;
 
@@ -126,9 +128,9 @@ main (int argc, char *argv[])
     }
 
 
-  print_tree (root, argc - 1);
+  print_tree (tree, argc - 1);
 
-  destroy_wordtree (root);
+  destroy_wordtree (tree);
   free (tmpBuff);
   free (buf);
   fclose (dictionaryFile);
